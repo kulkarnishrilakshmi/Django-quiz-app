@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% block title %} Quiz Search {% endblock %}
+{% block css %}
+<style>
+  .attempt {
+    --gradient: linear-gradient(to left top, #3b3b5a, 10%, #aaaaaa 90%) !important;
+    background: var(--gradient) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    border: 2px solid transparent !important;
+    transition: all 0.3s;
+  }
+
+  .attempt:hover {
+    background: #fffffa!important;
+    color: #000000 !important;
+    border-color: #3b3b5a !important;
+  }
+
+  .card {
+    border: 1px solid #a7ade1;
+    color: #3b3860;
+    margin-bottom: 2rem;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+
+  .modal-content {
+    background-color: #f8f9fa;
+    color: #3b3b5a;
+  }
+
+  .modal-header {
+    border-bottom: 1px solid #dee2e6;
+    background-color: #ffffff;
+    color: #3b3b5a;
+  }
+
+  .modal-body, .modal-footer {
+    color: #3b3b5a;
+  }
+
+  .btn-primary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+  }
+
+  .btn-primary:hover {
+    background-color: #495057;
+    border-color: #495057;
+  }
+
+  .btn-secondary {
+    background-color: #343a40;
+    border-color: #343a40;
+  }
+
+  .btn-secondary:hover {
+    background-color: #23272b;
+    border-color: #23272b;
+  }
+
+  .btn-close {
+    color: #6c757d;
+  }
+
+  #navbarcolor {
+    border-bottom: 1px solid #dee2e6;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Added box-shadow to bottom */
+  }
+
+   #navtext {
+    color: #3b3b5a !important;
+    font-size: 1.2rem;
+   }
+   .head1 {
+    color: #373661;
+    font-size: 2rem;
+    font-weight: bold;
+    height: 50px;
+  }
+
+  .head2 {
+    color: #373661;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+</style>
+{% endblock %}
+{% load static %}
+
+{% block body %}
+
+<h2 class="text-center my-4 ">Discover Your Next Challenge: Browse Our Exciting Quizzes!</h2>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal-title"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      {% if user.is_authenticated %}
+      <div class="modal-body" id="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" id="start-quiz" class="btn btn-secondary">Start Quiz</button>
+      </div>
+      {% else %}
+      <div class="modal-body">
+        <h3>Login first to start the quiz</h3>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<br><br><br>
+
+<!-- Search Bar -->
+<div class="container">
+    <form class="container d-flex my-4 align-items-center" role="search" method="get" action="{% url 'search' %}">
+      <div class="input-group">
+        <input name="q" class="form-control" type="search" placeholder="Search" aria-label="Search">
+        <button type="submit" class="btn btn-secondary">Search</button>
+      </div>
+    </form>
+  </div>
+
+<!-- Search Results -->
+<div class="container mt-4">
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+      {% if quiz %}
+      {% for quiz_item in quiz %}
+      <div class="col mb-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body d-flex flex-column justify-content-between">
+            <h5 class="card-title text-center mb-3">{{ quiz_item.name }}</h5>
+            <div class="text-center mb-3">
+              <button 
+                data-bs-toggle="modal" 
+                data-bs-target="#exampleModal"
+                data-time="{{ quiz_item.time }}"
+                data-questions="{{ quiz_item.number_of_questions }}"
+                data-name="{{ quiz_item.name }}"
+                data-id="{{ quiz_item.id }}"
+                class="btn btn-primary modal-button attempt"
+              >
+                <i class="fas fa-link"></i> Attempt Quiz
+              </button>
+            </div>
+            <p class="card-text text-muted text-center mb-0">
+              Time: {{ quiz_item.time }} minutes
+            </p>
+          </div>
+        </div>
+      </div>
+        {% endfor %}
+      {% else %}
+        <div class="col-12">
+          <div class="no-results">No quizzes found</div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block js %}
+<script>
+  const modalBtns = [...document.getElementsByClassName('modal-button')]
+  const modalBody = document.getElementById('modal-body')
+  const modaltitle = document.getElementById('modal-title')
+  const startQuiz = document.getElementById('start-quiz')
+
+  const url = window.location.href
+
+  modalBtns.forEach(modalBtn => modalBtn.addEventListener('click', () => {
+    const id = modalBtn.getAttribute('data-id')
+    const name = modalBtn.getAttribute('data-name')
+    const numberOfQuestions = modalBtn.getAttribute('data-questions')
+    const time = modalBtn.getAttribute('data-time')
+
+    modaltitle.innerHTML = `${name}`
+
+    modalBody.innerHTML = `
+    The ${name} consists of ${numberOfQuestions} questions and hence it is of ${numberOfQuestions} marks. You will be getting exactly ${time} seconds to complete ${numberOfQuestions} multiple choice questions. After completing the questions you can click on the
+          submit button to get your score and to understand the concept in which you made a mistake.<br>
+          All the best for the quiz!!!.
+    `
+
+    startQuiz.addEventListener('click', () => {
+        const url = `/quizzes/${id}/`;
+        window.location.href = url; 
+    });
+  }));
+
+  
+</script>
+{% endblock %}

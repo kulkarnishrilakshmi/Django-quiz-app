@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{%load static %}
+{% block title %} Welcome {{request.user}}{% endblock %}
+{% block body %}
+<div class="container my-5">
+    <div class="row d-flex justify-content-center">
+        <div class="col-md-6">
+            <div class="container-fluid w-100 h-100 text-center">
+                <div class=" text-center " style="color:#373661">
+                    <h1 class="display-2 fw-bold my-5">Welcome to Quiz Master</h1>
+                    <h3><pre class=" my-5">Unleash your inner genius 
+with our Quiz Master. 
+Where knowledge meets 
+knockout!</pre></h3>
+                </div>
+                <div class="container text-center" style="color:#373661;">
+                    <div class="d-flex justify-content-center">
+                      <a href="{% if user.is_authenticated %}/quizzes/{% else %}/login/{% endif %}" class="btn text-white px-4 mb-5 rounded-pill border-1" style="background-color:#373661;">Get Started</a>
+                    </div>
+                  </div>
+                  
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="container w-100">
+                <div>
+                    <img src="{% static './images/Capture.png' %}" class="img-fluid w-100 h-100" alt="...">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock body %}
