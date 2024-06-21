@@ -25,12 +25,12 @@
 {% block body %}
 
 <div class="container">
-  <div class="row justify-content-center mt-5">
+  <div class="row justify-content-center mt-5 p-4">
     <div class="col-lg-6 login-form-container">
       <div class="bg-light rounded-pill px-4 py-3 text-uppercase font-weight-bold mb-4 text-center" style="color:black;font-weight:bold">
         Login Details
       </div>
-      <form class="row g-4" method="POST" action="/login/">
+      <form class="row g-4" method="POST" action="{% url 'login' %}">
         {% csrf_token %}
         <div class="col-md-7 mx-auto">
           <label for="inputname" class="form-label" style="font-weight: bold;"><i>Username</i></label>
@@ -42,7 +42,14 @@
         </div>
         <div class="col-md-12 d-flex flex-column align-items-center mt-4">
           <button type="submit" class="btn btn-primary btn-submit mb-3">Submit</button>
-          <p class="my-4">New to QuizMaster?   <b><a href="/signup">Signup</a></b></p>
+          {% if messages %}
+          <ul class="messages">
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+          <p class="my-4">New to QuizMaster? <b><a href="/signup">Signup</a></b></p>
         </div>
       </form>
     </div>

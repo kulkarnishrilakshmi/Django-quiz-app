@@ -5,8 +5,8 @@
   .attempt {
     --gradient: linear-gradient(to left top, #3b3b5a, 10%, #aaaaaa 90%) !important;
     background: var(--gradient) !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
+    --webkit-background-clip: text !important;
+    --webkit-text-fill-color: transparent !important;
     border: 2px solid transparent !important;
     transition: all 0.3s;
   }
@@ -94,9 +94,6 @@
 {% load static %}
 
 {% block body %}
-
-<h2 class="text-center my-4 ">Discover Your Next Challenge: Browse Our Exciting Quizzes!</h2>
-
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -124,7 +121,7 @@
 
 <!-- Search Bar -->
 <div class="container">
-    <form class="container d-flex my-4 align-items-center" role="search" method="get" action="{% url 'search' %}">
+    <form class="container d-flex my-1 align-items-center p-4 shadow-sm" role="search" method="get" action="{% url 'search' %}">
       <div class="input-group">
         <input name="q" class="form-control" type="search" placeholder="Search" aria-label="Search">
         <button type="submit" class="btn btn-secondary">Search</button>
@@ -134,7 +131,7 @@
 
 <!-- Search Results -->
 <div class="container mt-4">
-  <div class="row row-cols-1 row-cols-md-3 g-4">
+  <div class="row row-cols-1 row-cols-md-4 g-4">
       {% if quiz %}
       {% for quiz_item in quiz %}
       <div class="col mb-4">

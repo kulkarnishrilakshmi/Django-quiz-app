@@ -1,12 +1,15 @@
 from django.shortcuts import render, redirect,get_object_or_404
 from .models import *
-from django.http import JsonResponse
+from django.http import JsonResponse , HttpResponseRedirect
 from django.contrib.auth  import authenticate,  login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from .forms import QuizForm, QuestionForm
 from django.forms import inlineformset_factory
 from django.db.models import Q
+from django.urls import reverse
+from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
 
 def index(request):
     quiz = Quiz.objects.all()
@@ -22,7 +25,7 @@ def about_us(request):
 def search_view(request):
     query = request.GET.get('q')
     if query:
-        search_query = Q(name__icontains=query) | Q(desc__icontains=query)
+        search_query = Q(name__icontains=query)
         quiz = Quiz.objects.filter(search_query)
     else:
         quiz = Quiz.objects.all()
@@ -98,26 +101,40 @@ def save_quiz_view(request, myid):
         pass
 
 
+
+
 def Signup(request):
     if request.user.is_authenticated:
         return redirect('/')
-    if request.method=="POST":   
+    
+    if request.method == "POST":   
         username = request.POST['username']
         email = request.POST['email']
-        first_name=request.POST['first_name']
-        last_name=request.POST['last_name']
+        first_name = request.POST['first_name']
+        last_name = request.POST['last_name']
         password = request.POST['password1']
         confirm_password = request.POST['password2']
         
         if password != confirm_password:
-            return redirect('/register')
+            messages.error(request, 'Passwords do not match.')
+            return redirect('/signup')
         
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Email already registered. Please <a href="/login">Login</a>.')
+            return redirect('/signup')
+        
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Username already taken.')
+            return redirect('/signup')
+
         user = User.objects.create_user(username, email, password)
         user.first_name = first_name
         user.last_name = last_name
         user.save()
-        return render(request, 'login.html')  
+        return redirect('/login')
+    
     return render(request, "signup.html")
+
 
 def Login(request):
     if request.user.is_authenticated:
@@ -132,6 +149,7 @@ def Login(request):
             login(request, user)
             return redirect("/")
         else:
+            messages.error(request, 'Invalid username or password. Please register if new')
             return render(request, "login.html") 
     return render(request, "login.html")
 
@@ -141,16 +159,30 @@ def Logout(request):
 
 
 def add_quiz(request):
-    if request.method=="POST":
-        form = QuizForm(data=request.POST)
+    if request.method == 'POST':
+        form = QuizForm(request.POST)
         if form.is_valid():
-            quiz = form.save(commit=False)
-            quiz.save()
-            obj = form.instance
-            return render(request, "add_quiz.html", {'obj':obj})
+            form.save()
+            return redirect('add_quiz')
     else:
-        form=QuizForm()
-    return render(request, "add_quiz.html", {'form':form})
+        form = QuizForm()
+    
+    quizzes = Quiz.objects.all()
+    quiz_details = [
+        {
+            'id': quiz.id,
+            'name': quiz.name,
+        }
+        for quiz in quizzes
+    ]
+    return render(request, 'add_quiz.html', {'form': form, 'quiz_details': quiz_details})
+
+#delete quiz
+def delete_quiz(request, quiz_id):
+    quiz = get_object_or_404(Quiz, pk=quiz_id)
+    quiz.delete()
+    return HttpResponseRedirect(reverse('add_quiz'))
+
 
 def add_question(request):
     questions = Question.objects.all().order_by('-id')
@@ -175,7 +207,24 @@ def add_question(request):
         'questions': questions,
         'question_count': question_count,
     }
+    
     return render(request, 'add_question.html', context)
+
+
+
+def edit_question(request, question_id):
+    if request.method == 'POST':
+        question = get_object_or_404(Question, pk=question_id)
+        new_content = request.POST.get('content', '')
+        if new_content:
+            question.content = new_content
+            question.save()
+            return JsonResponse({'message': 'Question updated successfully'})
+        else:
+            return JsonResponse({'error': 'Empty content provided'}, status=400)
+    else:
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
 
 
 def delete_question(request, myid):
@@ -228,3 +277,6 @@ def delete_result(request, myid):
         marks.delete()
         return redirect('/results')
     return render(request, "delete_result.html", {'marks':marks})
+
+
+

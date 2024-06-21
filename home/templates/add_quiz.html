@@ -2,10 +2,43 @@
 {% block title %} Add Quiz {% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <form action="/add_quiz/" method="POST"> {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-info">Submit</button>
-</form>
+<div class="container mt-4 p-4 border border-primary rounded shadow-sm">
+    <h2>Add Quiz</h2>
+    <hr>
+    <form action="/add_quiz/" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+<div class="container mt-4 p-4 mb-2 border border-primary rounded shadow-sm" >
+    <h2>Existing Quizzes</h2>
+    <hr>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Quiz Name</th>
+                <th>Action</th>
+                <th>Add Questions</th> 
+            </tr>
+        </thead>
+        <tbody>
+            {% for quiz in quiz_details %}
+            <tr>
+                <td>{{ quiz.name }}</td>
+                <td>
+                    <form action="{% url 'delete_quiz' quiz.id %}" method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+                <td>
+                    <a href="{% url 'add_question' %}" class="btn btn-outline-primary btn-sm">Add Questions</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

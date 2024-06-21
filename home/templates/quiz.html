@@ -5,29 +5,57 @@
 <style>
     .timer {
         float: right;
+        font-size: 1.2rem;
+        color: #332a34;
+        margin-top: 10px;
     }
 
     .total {
-        margin-bottom: 5px;
+        margin-bottom: 20px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #10bce7;
     }
 
-    input[type='radio']:checked:after {
-        width: 15px;
-        height: 15px;
-        border-radius: 15px;
-        top: -2px;
-        left: -1px;
-        position: relative;
-        background-color: #16b138;
+    input[type='radio'] {
+        display: none; /* Hide the default radio button */
+    }
+
+    .option-container {
+        margin-top: 20px;
+    }
+
+    .option {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+        cursor: pointer;
+    }
+
+    .option:hover {
+        background-color: #f0f0f0; /* Light gray background on hover */
+    }
+
+    .option input[type='radio'] + label {
+        margin-left: 12px;
+        font-size: 1.2rem;
+        color: #555; /* Text color */
+    }
+
+    .option input[type='radio'] + label::before {
         content: '';
         display: inline-block;
-        visibility: visible;
-        border: 2px solid white;
+        width: 24px;
+        height: 24px;
+        margin-right: 10px;
+        border: 2px solid #ccc; /* Border color */
+        border-radius: 50%;
+        transition: background-color 0.3s, border-color 0.3s; /* Smooth transition for background and border color */
     }
 
-    .logo {
-        position: relative;
-        bottom: 2rem;
+    .option input[type='radio']:checked + label::before {
+        background-color: #16b138; /* Checked background color */
+        border-color: #16b138; /* Checked border color */
     }
 
     .container-fluid {
@@ -36,26 +64,25 @@
 
     .head1 {
         color: #373661;
-        font-size: 2rem;
+        font-size: 2.5rem;
         font-weight: bold;
-        height: 50px;
+        margin-top: 30px;
+        margin-bottom: 20px;
     }
 
     .head2 {
         color: #373661;
-        font-size: 2rem;
+        font-size: 1.8rem;
         font-weight: bold;
+        margin-bottom: 20px;
     }
 
     #navbarcolor {
         border-bottom: 1px solid #dee2e6;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Added box-shadow to bottom */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding-bottom: 10px;
     }
 
-    #navtext {
-        color: #3b3b5a !important;
-        font-size: 1.2rem;
-    }
 </style>
 {% endblock css %}
 
@@ -65,7 +92,7 @@
     <div class="container">
         <h1 class="text-danger mt-3">
             {{quiz.name}}
-            <span class="badge bg-dark timer" id="hide-time">Seconds Left : <span
+            <span class="badge bg-light timer" id="hide-time">Seconds Left : <span
                     id="time-left">{{quiz.time}}</span></span>
         </h1>
 
@@ -77,7 +104,7 @@
                 <button type="submit" style="display: none" id="button1" class="btn btn-success mt-3">Submit</button>
                 <button type="button" id="backButton" class="btn btn-secondary mt-3">Go Back</button>
             </form>
-            <button class="badge bg-dark total" id="total" style="display: none"></button>
+            <button class="badge bg-outline-light total" id="total" style="display: none"></button>
             <div id="result-box"></div>
             <button type="button" class="start btn btn-outline-primary btn-lg start-button mt-3">Click Here to
                 Start Attempting the Quiz</button>
@@ -131,6 +158,7 @@
                         $(".ques").show();
                         $(".ans").show();
                         $(".answer").show();
+                        countDown();
                     });
                 },
                 error: function (error) {
@@ -146,6 +174,7 @@
         setInterval(fetchQuestions, 60000);
 
         // Timer countdown
+        const countDown= () =>{
         let timeLeft = parseInt(timeLeftDisplay.innerText);
         const timerInterval = setInterval(() => {
             timeLeft--;
@@ -156,11 +185,12 @@
             }
             timeLeftDisplay.innerText = timeLeft;
         }, 1000);
+        }
+        
 
         //backbutton functionality
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Other code
             
             // Add event listener to the back button
             const backButton = document.getElementById('backButton');

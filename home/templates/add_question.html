@@ -3,31 +3,84 @@
 
 {% block body %}
 <div class="container mt-4">
-  <form action="{% url 'add_question' %}" method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-info">Submit</button>
-  </form>
-  <br>
-  <p>Total Questions: {{ question_count }}</p>  <!-- Display total count of questions -->
-  <br>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Question</th>
-        <th>Quiz</th>
-        <th>Delete</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for question in questions %}
-      <tr>
-        <td><a href="/add_options/{{ question.id }}/">{{ question.content }}</a></td>
-        <td>{{ question.quiz }}</td>
-        <td><a href="/delete_question/{{ question.id }}/" class="btn btn-danger">Delete</a></td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <div class="container mt-4 p-4 border border-primary rounded shadow-sm">
+    <form action="{% url 'add_question' %}" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-info">Submit</button>
+    </form>
+  </div>
+
+  <div class="container mt-4 p-4 mb-2 border border-primary rounded shadow-sm">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Question</th>
+          <th>Quiz</th>
+          <th>Add Options</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for question in questions %}
+        <tr>
+          <td id="question-{{ question.id }}" class="editable" onclick="editQuestion(event, {{ question.id }})" contenteditable="true">
+            {{ question.content }}
+          </td>
+          <td>{{ question.quiz }}</td>
+          <td><a href="{% url 'add_options' question.id %}" class="btn btn-outline-primary">Add Options</a></td>
+          <td><a href="/delete_question/{{ question.id }}/" class="btn btn-danger">Delete</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+  function editQuestion(event, questionId) {
+    const questionElement = event.target;
+    
+    // Handle Enter key press
+    questionElement.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault(); // Prevent default behavior (new line in contenteditable)
+        
+        // Save changes
+        const updatedContent = questionElement.innerText.trim();
+        console.log(updatedContent)
+        
+        if (updatedContent !== '') {
+          $.ajax({
+            type: 'POST',
+            url: `/edit_question/${questionId}/`,
+            data: {
+              content: updatedContent,
+              csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(response) {
+              console.log('Question updated successfully');
+              questionElement.blur(); // Remove focus
+              questionElement.classList.remove('editing');
+              questionElement.innerText = updatedContent; // Update displayed content
+            },
+            error: function(error) {
+              console.error('Error updating question:', error);
+              alert('Failed to update question. Please try again.');
+            }
+          });
+        } else {
+          alert('Question content cannot be empty.');
+        }
+      }
+    });
+    
+    // Toggle editing class
+    if (!questionElement.classList.contains('editing')) {
+      questionElement.classList.add('editing');
+      questionElement.focus(); // Set focus to the editable element
+    }
+  }
+</script>
 {% endblock %}

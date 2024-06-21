@@ -11,14 +11,14 @@
  <style>
   .head1 {
     color: #3b3b5a;
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: bold;
     height: 50px;
   }
 
   .head2 {
     color: #3b3b5a;
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: bold;
   }
 
@@ -29,21 +29,21 @@
 
   #navtext {
     color: #3b3b5a !important;
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
  </style> 
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-light border-bottom 0" id="navbarcolor">
     <div class="container">
-      <a class="navbar-brand" href="/"><span class="head1">Quiz</span> <span class="head2">Master </span></a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" style="color:#3b3b5a;">
+      <a class="navbar-brand " href="/"><span class="head1">Quiz</span> <span class="head2">Master </span></a>
+      <button class="navbar-toggler p-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" style="color:#3b3b5a;">
         <span class="navbar-toggler-icon"></span>
       </button>
       
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         {% if user.is_authenticated %}
-        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <ul class="navbar-nav ms-auto mb-1 mb-lg-0">
           <li class="nav-item">
             <a class="nav-link btn btn-white" href="/" id="navtext">Home</a>
           </li>
@@ -53,26 +53,26 @@
           <li class="nav-item">
             <a class="nav-link btn btn-white" href="/quizzes" id="navtext">Quizzes</a>
           </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle btn btn-white" href="#" id="navtext" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Welcome
-            </a>
-            <ul class="dropdown-menu dropdown-menu-light rounded-pill btn btn-white" aria-labelledby="navbarDarkDropdownMenuLink">
-              <li><a class="dropdown-item" href="/logout">Logout</a></li>
-            </ul>
-  
           {% if user.is_superuser %}
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle btn btn-white" href="#" id="navtext" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Admin
+              Activity
             </a>
             <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarDarkDropdownMenuLink">
-              <li><a class="dropdown-item" href="/add_quiz/">Add Quiz</a></li>
+              <li><a class="dropdown-item" href="/add_quiz/">Add / Delete Quiz</a></li>
               <li><a class="dropdown-item" href="/add_question/">Add / Delete Questions</a></li>
               <li><a class="dropdown-item" href="/results/">Results of the Users</a></li>
             </ul>
           </li>
           {% endif %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle btn btn-white" href="#" id="navtext" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              {{user.username}}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-light rounded-pill btn btn-white" aria-labelledby="navbarDarkDropdownMenuLink">
+              <li><a class="dropdown-item" href="/logout">Logout</a></li>
+            </ul>
+  
         </ul>
         {% else %}
         <ul class="navbar-nav ms-auto mb-2 me-2 mb-lg-0 d-flex align-items-center">
